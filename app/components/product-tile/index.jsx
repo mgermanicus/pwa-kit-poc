@@ -54,6 +54,84 @@ export const Skeleton = () => {
     )
 }
 
+const ImagesSlider = (props) => {
+    if (props.imageGroups) {
+        return (
+            <ImageGallery
+                size="md"
+                imageGroups={imageGroups}
+            />
+        )
+    } else {
+        return (
+            <AspectRatio {...props.styles.image}>
+                <DynamicImage
+                    src={`${props.image.disBaseLink || props.image.link}[?sw={width}&q=60]`}
+                    widths={props.dynamicImageProps?.widths}
+                    imageProps={{
+                        alt: props.image.alt,
+                        ...props.dynamicImageProps?.imageProps
+                    }}
+                />
+            </AspectRatio>
+        )
+    }
+}
+
+const RadioColors = (props) => {
+    return (
+        <>
+            {/* Attribute Swatches */}
+            {props.variationAttributes?.map((variationAttribute) => {
+                const {id, name, selectedValue, values = []} = variationAttribute
+
+                if (name === 'Color' && id)
+                    return (
+                        <SwatchGroup
+                            key={id}
+                            onChange={(_, href) => {
+                                if (!href) return
+                                history.replace(href)
+                            }}
+                            variant={id === 'color' ? 'circle' : 'square'}
+                            value={selectedValue?.value}
+                            displayName={selectedValue?.name || ''}
+                            label={name}
+                        >
+                            {values.map(({name, value, image}) => (
+                                <Swatch
+                                    key={value}
+                                    href={''}
+                                    disabled={false}
+                                    value={value}
+                                    name={name}
+                                >
+                                    {id === 'color' ? (
+                                        <Box
+                                            height="100%"
+                                            width="100%"
+                                            minWidth="32px"
+                                            backgroundRepeat="no-repeat"
+                                            backgroundSize="cover"
+                                            backgroundColor={name.toLowerCase()}
+                                            backgroundImage={
+                                                image
+                                                    ? `url(${image.disBaseLink || image.link})`
+                                                    : ''
+                                            }
+                                        />
+                                    ) : (
+                                        name
+                                    )}
+                                </Swatch>
+                            ))}
+                        </SwatchGroup>
+                    )
+            })}
+        </>
+    )
+}
+
 /**
  * The ProductTile is a simple visual representation of a
  * product object. It will show it's default image, name and price.
@@ -71,9 +149,9 @@ const ProductTile = (props) => {
     } = props
     const {currency, image, price, productId, imageGroups} = product
 
-    let variationAttributes;
+    let variationAttributes
     if (product.variants) {
-        variationAttributes = useVariationAttributes(product);
+        variationAttributes = useVariationAttributes(product)
     }
 
     // ProductTile is used by two components, RecommendedProducts and ProductList.
@@ -86,129 +164,81 @@ const ProductTile = (props) => {
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
 
-    let imageList;
-    let test;
+    let test
     if (imageGroups) {
-        test = (<ImageGallery
-            size="md"
-            imageGroups={imageGroups}
-            selectedVariationAttributes={variationAttributes[0]}
-        />);
-    } else {
-        test = (<AspectRatio {...styles.image}>
-            <DynamicImage
-                src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
-                widths={dynamicImageProps?.widths}
-                imageProps={{
-                    alt: image.alt,
-                    ...dynamicImageProps?.imageProps
-                }}
+        test = (
+            <ImageGallery
+                size="md"
+                imageGroups={imageGroups}
+                selectedVariationAttributes={variationAttributes[0]}
             />
-        </AspectRatio>)
-    }
-
-    let variations;
-    if (variationAttributes) {
-        variations = variationAttributes.map((variationAttribute) => {
-            const {
-                id,
-                name,
-                selectedValue,
-                values = []
-            } = variationAttribute
-            return (
-                <SwatchGroup
-                    key={id}
-                    onChange={(_, href) => {
-                        if (!href) return
-                        history.replace(href)
+        )
+    } else {
+        test = (
+            <AspectRatio {...styles.image}>
+                <DynamicImage
+                    src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
+                    widths={dynamicImageProps?.widths}
+                    imageProps={{
+                        alt: image.alt,
+                        ...dynamicImageProps?.imageProps
                     }}
-                    variant={id === 'color' ? 'circle' : 'square'}
-                    value={selectedValue?.value}
-                    displayName={selectedValue?.name || ''}
-                    label={name}
-                >
-                    {values.map(({ href, name, image, value, orderable }) => (
-                        <Swatch
-                            key={value}
-                            href={href}
-                            disabled={!orderable}
-                            value={value}
-                            name={name}
-                        >
-                            {image ? (
-                                <Box
-                                    height="100%"
-                                    width="100%"
-                                    minWidth="32px"
-                                    backgroundRepeat="no-repeat"
-                                    backgroundSize="cover"
-                                    backgroundColor={name.toLowerCase()}
-                                    backgroundImage={
-                                        image
-                                            ? `url(${image.disBaseLink ||
-                                            image.link})`
-                                            : ''
-                                    }
-                                />
-                            ) : (
-                                name
-                            )}
-                        </Swatch>
-                    ))}
-                </SwatchGroup>
-            );
-        });
+                />
+            </AspectRatio>
+        )
     }
 
     return (
-        <Link
-            data-testid="product-tile"
-            {...styles.container}
-            to={productUrlBuilder({id: productId}, intl.local)}
-            {...rest}
-        >
-            <Box {...styles.imageWrapper}>
-                <>{test}</>
-                <>{variations}</>
-                {enableFavourite && (
-                    <Box
-                        onClick={(e) => {
-                            // stop click event from bubbling
-                            // to avoid user from clicking the underlying
-                            // product while the favourite icon is disabled
-                            e.preventDefault()
-                        }}
-                    >
-                        <IconButtonWithRegistration
-                            aria-label={intl.formatMessage({
-                                id: 'product_tile.assistive_msg.wishlist',
-                                defaultMessage: 'Wishlist'
-                            })}
-                            icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
-                            {...styles.favIcon}
-                            disabled={isFavouriteLoading}
-                            onClick={async () => {
-                                setFavouriteLoading(true)
-                                await onFavouriteToggle(!isFavourite)
-                                setFavouriteLoading(false)
+        <div {...styles.container}>
+            <Link
+                data-testid="product-tile"
+                to={productUrlBuilder({id: productId}, intl.local)}
+                {...rest}
+            >
+                <Box {...styles.imageWrapper}>
+                    <>{test}</>
+                    {/* <>{variations}</> */}
+                    {enableFavourite && (
+                        <Box
+                            onClick={(e) => {
+                                // stop click event from bubbling
+                                // to avoid user from clicking the underlying
+                                // product while the favourite icon is disabled
+                                e.preventDefault()
                             }}
-                        />
-                    </Box>
-                )}
-            </Box>
+                        >
+                            <IconButtonWithRegistration
+                                aria-label={intl.formatMessage({
+                                    id: 'product_tile.assistive_msg.wishlist',
+                                    defaultMessage: 'Wishlist'
+                                })}
+                                icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
+                                {...styles.favIcon}
+                                disabled={isFavouriteLoading}
+                                onClick={async () => {
+                                    setFavouriteLoading(true)
+                                    await onFavouriteToggle(!isFavourite)
+                                    setFavouriteLoading(false)
+                                }}
+                            />
+                        </Box>
+                    )}
+                </Box>
 
-            {/* Title */}
-            <Text {...styles.title}>{localizedProductName}</Text>
+                {/* Title */}
+                <Text {...styles.title}>{localizedProductName}</Text>
 
-            {/* Price */}
-            <Text {...styles.price}>
-                {intl.formatNumber(price, {
-                    style: 'currency',
-                    currency: currency || activeCurrency
-                })}
-            </Text>
-        </Link>
+                {/* Price */}
+                <Text {...styles.price}>
+                    {intl.formatNumber(price, {
+                        style: 'currency',
+                        currency: currency || activeCurrency
+                    })}
+                </Text>
+            </Link>
+
+            <RadioColors variationAttributes={variationAttributes}></RadioColors>
+        </div>
     )
 }
 
