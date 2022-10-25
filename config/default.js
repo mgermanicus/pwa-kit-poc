@@ -1,4 +1,6 @@
 const sites = require('./sites.js')
+require('dotenv').config()
+
 module.exports = {
     app: {
         // Customize how your 'site' and 'locale' are displayed in the url.
@@ -22,9 +24,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '3e90959e-eb2c-422f-8fab-8f859b71e789',
-                organizationId: 'f_ecom_zycj_021',
-                shortCode: 'kv7kzm78',
+                clientId: process.env.CLIENT_ID,
+                organizationId: process.env.ORGANIZATION_ID,
+                shortCode: process.env.SHORT_CODE,
                 siteId: 'RefArch'
             }
         },
@@ -58,11 +60,11 @@ module.exports = {
         ssrFunctionNodeVersion: '14.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: process.env.PROXY_HOST,
                 path: 'api'
             },
             {
-                host: 'zycj-021.sandbox.us03.dx.commercecloud.salesforce.com',
+                host: process.env.SANDBOX_URL,
                 path: 'ocapi'
             },
             {
