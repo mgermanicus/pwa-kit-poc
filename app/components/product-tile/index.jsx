@@ -54,30 +54,6 @@ export const Skeleton = () => {
     )
 }
 
-const ImagesSlider = (props) => {
-    if (props.imageGroups) {
-        return (
-            <ImageGallery
-                size="md"
-                imageGroups={imageGroups}
-            />
-        )
-    } else {
-        return (
-            <AspectRatio {...props.styles.image}>
-                <DynamicImage
-                    src={`${props.image.disBaseLink || props.image.link}[?sw={width}&q=60]`}
-                    widths={props.dynamicImageProps?.widths}
-                    imageProps={{
-                        alt: props.image.alt,
-                        ...props.dynamicImageProps?.imageProps
-                    }}
-                />
-            </AspectRatio>
-        )
-    }
-}
-
 const RadioColors = (props) => {
     return (
         <>
@@ -164,9 +140,9 @@ const ProductTile = (props) => {
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
 
-    let test
+    let imagesSlider
     if (imageGroups) {
-        test = (
+        imagesSlider = (
             <ImageGallery
                 size="md"
                 imageGroups={imageGroups}
@@ -174,7 +150,7 @@ const ProductTile = (props) => {
             />
         )
     } else {
-        test = (
+        imagesSlider = (
             <AspectRatio {...styles.image}>
                 <DynamicImage
                     src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
@@ -190,41 +166,40 @@ const ProductTile = (props) => {
 
     return (
         <div {...styles.container}>
+            <Box {...styles.imageWrapper}>
+                {enableFavourite && (
+                    <Box
+                        onClick={(e) => {
+                            // stop click event from bubbling
+                            // to avoid user from clicking the underlying
+                            // product while the favourite icon is disabled
+                            e.preventDefault()
+                        }}
+                    >
+                        <IconButtonWithRegistration
+                            aria-label={intl.formatMessage({
+                                id: 'product_tile.assistive_msg.wishlist',
+                                defaultMessage: 'Wishlist'
+                            })}
+                            icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
+                            {...styles.favIcon}
+                            disabled={isFavouriteLoading}
+                            onClick={async () => {
+                                setFavouriteLoading(true)
+                                await onFavouriteToggle(!isFavourite)
+                                setFavouriteLoading(false)
+                            }}
+                        />
+                    </Box>
+                )}
+            </Box>
+            {imagesSlider}
+
             <Link
                 data-testid="product-tile"
                 to={productUrlBuilder({id: productId}, intl.local)}
                 {...rest}
             >
-                <Box {...styles.imageWrapper}>
-                    <>{test}</>
-                    {/* <>{variations}</> */}
-                    {enableFavourite && (
-                        <Box
-                            onClick={(e) => {
-                                // stop click event from bubbling
-                                // to avoid user from clicking the underlying
-                                // product while the favourite icon is disabled
-                                e.preventDefault()
-                            }}
-                        >
-                            <IconButtonWithRegistration
-                                aria-label={intl.formatMessage({
-                                    id: 'product_tile.assistive_msg.wishlist',
-                                    defaultMessage: 'Wishlist'
-                                })}
-                                icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
-                                {...styles.favIcon}
-                                disabled={isFavouriteLoading}
-                                onClick={async () => {
-                                    setFavouriteLoading(true)
-                                    await onFavouriteToggle(!isFavourite)
-                                    setFavouriteLoading(false)
-                                }}
-                            />
-                        </Box>
-                    )}
-                </Box>
-
                 {/* Title */}
                 <Text {...styles.title}>{localizedProductName}</Text>
 
