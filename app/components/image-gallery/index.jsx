@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useMemo, useEffect} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 
@@ -13,17 +13,16 @@ import {useLocation} from 'react-router-dom'
 import {
     AspectRatio,
     Box,
-    Img,
     Flex,
-
-    // Hooks
-    Skeleton as ChakraSkeleton,
-    ListItem,
+    Img,
     List,
+    ListItem,
+    Skeleton as ChakraSkeleton,
     useMultiStyleConfig
 } from '@chakra-ui/react'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
 import DynamicImage from '../dynamic-image'
+import Carousel from 'framer-motion-carousel'
 
 const EnterKeyNumber = 13
 
@@ -89,7 +88,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
     const thumbnailImageGroup = useMemo(
         () =>
             findImageGroupBy(imageGroups, {
-                viewType: SMALL,
+                viewType: LARGE,
                 selectedVariationAttributes
             }),
         [selectedVariationAttributes]
@@ -102,49 +101,23 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
 
     return (
         <Flex direction="column">
-            {heroImage && (
-                <Box {...styles.heroImageGroup}>
-                    <AspectRatio {...styles.heroImage} ratio={1}>
-                        <DynamicImage
-                            src={`${heroImage.disBaseLink || heroImage.link}[?sw={width}&q=60]`}
-                            widths={{
-                                base: '100vw',
-                                lg: heroImageMaxWidth
-                            }}
-                            imageProps={{
-                                alt: heroImage.alt
-                            }}
-                        />
-                    </AspectRatio>
-                </Box>
-            )}
-
-            
-            <List display={'flex'} flexWrap={'wrap'}>
-                {thumbnailImages.map((image, index) => {
-                    const selected = index === selectedIndex
-                    return (
-                        <ListItem
-                            {...styles.thumbnailImageItem}
-                            tabIndex={0}
+            <div>
+                <Carousel
+                    loop={true}
+                    autoPlay={false}
+                    interval={2000}
+                    renderDots={(args) => args.activeIndex}
+                >
+                    {thumbnailImages.map((image, index) => (
+                        <img
+                            alt={image.alt}
+                            src={image.disBaseLink}
+                            draggable="false"
                             key={index}
-                            data-testid="image-gallery-thumbnails"
-                            onKeyDown={(e) => {
-                                if (e.keyCode === EnterKeyNumber) {
-                                    return setSelectedIndex(index)
-                                }
-                            }}
-                            onClick={() => setSelectedIndex(index)}
-                            borderColor={`${selected ? 'black' : ''}`}
-                            borderWidth={`${selected ? '1px' : 0}`}
-                        >
-                            <AspectRatio ratio={1}>
-                                <Img alt={image.alt} src={image.disBaseLink} />
-                            </AspectRatio>
-                        </ListItem>
-                    )
-                })}
-            </List>
+                        />
+                    ))}
+                </Carousel>
+            </div>
         </Flex>
     )
 }

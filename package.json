@@ -92,6 +92,7 @@
     "last 4 ChromeAndroid versions"
   ],
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "framer-motion-carousel": "^2.0.1"
   }
 }
