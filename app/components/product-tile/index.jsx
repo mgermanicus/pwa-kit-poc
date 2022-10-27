@@ -69,6 +69,8 @@ const ImagesCarousel = (props) => {
         }
     })
 
+    if (allImages.length === 0) allImages = [props.image]
+
     const allImagesSize = allImages.length
     const theme = useTheme()
     const [index, setActiveStep] = React.useState(0)
@@ -135,46 +137,79 @@ const RadioColors = (props) => {
 
                 if (name === 'Color' && id)
                     return (
-                        <SwatchGroup
-                            key={id}
-                            onChange={(_, href) => {
-                                if (!href) return
-                                history.replace(href)
-                            }}
-                            variant={id === 'color' ? 'circle' : 'square'}
-                            value={selectedValue?.value}
-                            displayName={selectedValue?.name || ''}
-                            label={name}
-                        >
+                        <div style={{textAlign: "center"}}>
                             {values.map(({name, value, image}) => (
-                                <Swatch
+                                <div
                                     key={value}
                                     href={''}
                                     disabled={false}
                                     value={value}
                                     name={name}
+                                    style={{
+                                        position: 'relative',
+                                        display: 'inline-flex',
+                                        margin: '5px',
+                                        width: '25px',
+                                        height: '25px',
+                                        overflow: 'hidden',
+                                        borderRadius: '50%'
+                                    }}
                                 >
                                     {id === 'color' ? (
-                                        <Box
+                                        <img
                                             height="100%"
                                             width="100%"
-                                            minWidth="32px"
-                                            backgroundRepeat="no-repeat"
-                                            backgroundSize="cover"
-                                            backgroundColor={name.toLowerCase()}
-                                            backgroundImage={
-                                                image
-                                                    ? `url(${image.disBaseLink || image.link})`
-                                                    : ''
-                                            }
+                                            src={image ? `${image.disBaseLink || image.link}` : ''}
                                         />
                                     ) : (
                                         name
                                     )}
-                                </Swatch>
+                                </div>
                             ))}
-                        </SwatchGroup>
+                        </div>
                     )
+
+                // return (
+                //     <SwatchGroup
+                //         key={id}
+                //         onChange={(_, href) => {
+                //             if (!href) return
+                //             history.replace(href)
+                //         }}
+                //         variant={id === 'color' ? 'circle' : 'square'}
+                //         value={selectedValue?.value}
+                //         displayName={selectedValue?.name || ''}
+                //         label={name}
+                //     >
+                //         {values.map(({name, value, image}) => (
+                //             <Swatch
+                //                 key={value}
+                //                 href={''}
+                //                 disabled={false}
+                //                 value={value}
+                //                 name={name}
+                //             >
+                //                 {id === 'color' ? (
+                //                     <Box
+                //                         height="100%"
+                //                         width="100%"
+                //                         minWidth="32px"
+                //                         backgroundRepeat="no-repeat"
+                //                         backgroundSize="cover"
+                //                         backgroundColor={name.toLowerCase()}
+                //                         backgroundImage={
+                //                             image
+                //                                 ? `url(${image.disBaseLink || image.link})`
+                //                                 : ''
+                //                         }
+                //                     />
+                //                 ) : (
+                //                     name
+                //                 )}
+                //             </Swatch>
+                //         ))}
+                //     </SwatchGroup>
+                // )
             })}
         </>
     )
@@ -244,6 +279,7 @@ const ProductTile = (props) => {
 
             <ImagesCarousel
                 styles={styles}
+                image={image}
                 imageGroups={imageGroups}
                 dynamicImageProps={dynamicImageProps}
             />
