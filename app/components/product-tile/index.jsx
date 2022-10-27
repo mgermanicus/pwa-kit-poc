@@ -8,9 +8,6 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {HeartIcon, HeartSolidIcon} from '../icons'
-import ImageGallery from '../../components/image-gallery'
-import SwatchGroup from '../../components/swatch-group'
-import Swatch from '../../components/swatch-group/swatch'
 import {useVariationAttributes} from '../../hooks'
 
 // Components
@@ -23,7 +20,16 @@ import {
     useMultiStyleConfig,
     IconButton
 } from '@chakra-ui/react'
-import DynamicImage from '../dynamic-image'
+import SwatchGroup from '../../components/swatch-group'
+import Swatch from '../../components/swatch-group/swatch'
+
+// Custom Pictures Slideshow
+import Button from '@material-ui/core/Button'
+import MobileStepper from '@material-ui/core/MobileStepper'
+import Paper from '@material-ui/core/Paper'
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
+import {useTheme} from '@material-ui/core/styles'
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft'
 
 // Hooks
 import {useIntl} from 'react-intl'
@@ -51,6 +57,72 @@ export const Skeleton = () => {
                 <ChakraSkeleton width={{base: '120px', md: '220px'}} height="12px" />
             </Stack>
         </Box>
+    )
+}
+
+const ImagesCarousel = (props) => {
+    let allImages = []
+    props.imageGroups?.map((imageGroup) => {
+        const {images, viewType} = imageGroup
+        if (viewType === 'large') {
+            allImages.push(...images)
+        }
+    })
+
+    const allImagesSize = allImages.length
+    const theme = useTheme()
+    const [index, setActiveStep] = React.useState(0)
+
+    const goToPrevPicture = () => {
+        setActiveStep((nextActiveStep) => nextActiveStep - 1)
+    }
+
+    const goToNextPicture = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1)
+    }
+
+    return (
+        <div {...props.styles.image}>
+            <Paper
+                square
+                elevation={0}
+                style={{
+                    height: 50,
+                    display: 'flex',
+                    paddingLeft: theme.spacing(4),
+                    backgroundColor: theme.palette.background.default,
+                    alignItems: 'center'
+                }}
+            />
+            <img
+                src={allImages[index].disBaseLink ?? allImages[index].link}
+                style={{display: 'block', overflow: 'hidden'}}
+                alt={allImages[index].title}
+            />
+            <MobileStepper
+                variant="text"
+                position="static"
+                index={index}
+                steps={allImagesSize}
+                activeStep={index}
+                backButton={
+                    <Button size="small" onClick={goToPrevPicture} disabled={index === 0}>
+                        Prev
+                        <KeyboardArrowLeft />
+                    </Button>
+                }
+                nextButton={
+                    <Button
+                        size="small"
+                        onClick={goToNextPicture}
+                        disabled={index === allImagesSize - 1}
+                    >
+                        Next
+                        <KeyboardArrowRight />
+                    </Button>
+                }
+            />
+        </div>
     )
 }
 
@@ -140,30 +212,6 @@ const ProductTile = (props) => {
     const [isFavouriteLoading, setFavouriteLoading] = useState(false)
     const styles = useMultiStyleConfig('ProductTile')
 
-    let imagesSlider
-    if (imageGroups) {
-        imagesSlider = (
-            <ImageGallery
-                size="md"
-                imageGroups={imageGroups}
-                selectedVariationAttributes={variationAttributes[0]}
-            />
-        )
-    } else {
-        imagesSlider = (
-            <AspectRatio {...styles.image}>
-                <DynamicImage
-                    src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
-                    widths={dynamicImageProps?.widths}
-                    imageProps={{
-                        alt: image.alt,
-                        ...dynamicImageProps?.imageProps
-                    }}
-                />
-            </AspectRatio>
-        )
-    }
-
     return (
         <div {...styles.container}>
             <Box {...styles.imageWrapper}>
@@ -193,7 +241,12 @@ const ProductTile = (props) => {
                     </Box>
                 )}
             </Box>
-            {imagesSlider}
+
+            <ImagesCarousel
+                styles={styles}
+                imageGroups={imageGroups}
+                dynamicImageProps={dynamicImageProps}
+            />
 
             <Link
                 data-testid="product-tile"

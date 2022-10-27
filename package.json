@@ -92,6 +92,8 @@
     "last 4 ChromeAndroid versions"
   ],
   "dependencies": {
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
     "dotenv": "^16.0.3"
   }
 }
