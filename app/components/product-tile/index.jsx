@@ -68,12 +68,12 @@ const RadioColors = (props) => {
                             key={id}
                             onChange={(_,href) => {
                                 for (const i in values) {
-                                    console.log('href: '+href)
+                                    // console.log('href: '+href)
                                     if (values[i].href === href) {
                                         selectedValue = values[i]
                                     }
                                 }
-                                console.log(selectedValue)
+                                // console.log(selectedValue)
                             }}
                             variant={id === 'color' ? 'circle' : 'square'}
                             value={selectedValue?.value}
@@ -87,7 +87,7 @@ const RadioColors = (props) => {
                                 // console.log(value)
                                 // console.log(orderable)
 
-                                console.log(image)
+                                // console.log(image)
                                 return (
                                     <Swatch
                                         key={value}

@@ -14,20 +14,14 @@ import {
     AspectRatio,
     Box,
     Flex,
-    Img,
-    List,
-    ListItem,
     Skeleton as ChakraSkeleton,
     useMultiStyleConfig
 } from '@chakra-ui/react'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
-import DynamicImage from '../dynamic-image'
-import Carousel from 'framer-motion-carousel'
+import Carousel from '../carousel'
 
-const EnterKeyNumber = 13
 
 const LARGE = 'large'
-const SMALL = 'small'
 
 /**
  * The skeleton representation of the image gallery component. Use this component while
@@ -62,9 +56,8 @@ Skeleton.propTypes = {
  * The image gallery displays a hero image and thumbnails below it. You can control which
  * image groups that are use by passing in the current selected variation values.
  */
-const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}) => {
+const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}}) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
-    const styles = useMultiStyleConfig('ImageGallery', {size})
     const location = useLocation()
 
     // Get the 'hero' image for the current variation.
@@ -82,7 +75,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
         setSelectedIndex(0)
     }, [location.search])
 
-    // Get a memoized image group used for the thumbnails. We use the `useMemo` hook
+    // Get a memorized image group used for the thumbnails. We use the `useMemo` hook
     // so we don't have to waste time filtering the image groups each render if the
     // selected variation attributes haven't changed.
     const thumbnailImageGroup = useMemo(
@@ -94,29 +87,12 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size}
         [selectedVariationAttributes]
     )
 
-    const heroImage = heroImageGroup?.images?.[selectedIndex]
     const thumbnailImages = thumbnailImageGroup?.images || []
-
-    const heroImageMaxWidth = styles.heroImage.maxWidth[3] // in px
 
     return (
         <Flex direction="column">
             <div>
-                <Carousel
-                    loop={true}
-                    autoPlay={false}
-                    interval={2000}
-                    renderDots={(args) => args.activeIndex}
-                >
-                    {thumbnailImages.map((image, index) => (
-                        <img
-                            alt={image.alt}
-                            src={image.disBaseLink}
-                            draggable="false"
-                            key={index}
-                        />
-                    ))}
-                </Carousel>
+                {Carousel(thumbnailImages)}
             </div>
         </Flex>
     )

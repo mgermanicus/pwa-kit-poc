@@ -12,7 +12,7 @@ module.exports = {
     ...base,
     moduleNameMapper: {
         ...base.moduleNameMapper,
-        '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js'
+        '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.jsx'
     },
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
