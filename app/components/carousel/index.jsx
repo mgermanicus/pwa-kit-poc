@@ -74,7 +74,7 @@ export default function Carousel(thumbnailImages) {
                         <img
                             alt={image.alt}
                             src={image.disBaseLink}
-                            draggable='true'
+                            draggable='false'
                             key={index}
                         />
                     )
