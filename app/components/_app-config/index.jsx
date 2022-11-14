@@ -6,12 +6,10 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {ChakraProvider} from '@chakra-ui/react'
 
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from '../../theme'
 import CommerceAPI from '../../commerce-api'
 import {
     BasketProvider,
@@ -24,6 +22,7 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '../../utils/url'
+import TestComponent from '../test-component'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -43,7 +42,7 @@ const AppConfig = ({children, locals = {}}) => {
                 <CustomerProvider value={{customer, setCustomer}}>
                     <BasketProvider value={{basket, setBasket}}>
                         <CustomerProductListsProvider>
-                            <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                            <TestComponent message={"Hello :) Look into the console of the browser"}></TestComponent>
                         </CustomerProductListsProvider>
                     </BasketProvider>
                 </CustomerProvider>
